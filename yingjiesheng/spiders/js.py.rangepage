@@ -1,0 +1,34 @@
+# -*- coding: utf-8 -*-
+import scrapy
+from scrapy import log
+
+from yingjiesheng.items import YingjieshengItem
+
+class JsSpider(scrapy.Spider):
+    name = "js"
+    allowed_domains = ["yingjiesheng.com"]
+    download_delay = 2
+    start_urls = []
+    for i in range(1,3):
+        start_urls.append('http://www.yingjiesheng.com/jiangsujob/list_'+str(i)+'.html')
+    print start_urls
+    def parse(self, response):
+
+	sites = response.xpath('//td[@class="item1"]')
+	items = []
+
+	for site in sites:
+	    item = YingjieshengItem()
+
+	    name = site.xpath('a/text()').extract()
+	    link = site.xpath('a/@href').extract()
+
+	    item['company_name']=[n.encode('utf-8') for n in name]
+	    item['company_link']=[t.encode('utf-8') for t in link]
+	    items.append(item)
+
+	    log.msg("Appending item ...",level = 'INFO')
+
+
+	log.msg("Apend done.",level = 'INFO')
+	return items
